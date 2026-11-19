@@ -51,8 +51,9 @@ class TicketCreationView(ui.View):
             await interaction.response.send_message("Ticket-Kategorie nicht konfiguriert.", ephemeral=True)
             return
 
-        category = self.bot.get_channel(category_id)
-        if not category:
+        try:
+            category = await self.bot.fetch_channel(category_id)
+        except discord.NotFound:
             await interaction.response.send_message("Ticket-Kategorie nicht gefunden.", ephemeral=True)
             return
 
@@ -239,7 +240,6 @@ class Tickets(commands.Cog):
     async def cog_load(self):
         self.bot.add_view(TicketCreationView(self.bot))
         self.bot.add_view(TicketManagementView(self.bot))
-        await self.check_ticket_panel()
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -252,8 +252,9 @@ class Tickets(commands.Cog):
             logger.warning("Ticket creation channel ID not configured.")
             return
 
-        channel = self.bot.get_channel(channel_id)
-        if not channel:
+        try:
+            channel = await self.bot.fetch_channel(channel_id)
+        except discord.NotFound:
             logger.warning(f"Ticket creation channel {channel_id} not found.")
             return
 

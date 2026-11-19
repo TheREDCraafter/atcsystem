@@ -23,7 +23,6 @@ class MyBot(commands.Bot):
         self.storage = Storage()
         await self.load_extension("cogs.events")
         await self.load_extension("cogs.commands")
-        await self.load_extension("cogs.bridge")
         await self.load_extension("cogs.tickets")
         logger.info("Extensions loaded")
 
