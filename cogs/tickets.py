@@ -91,13 +91,9 @@ class TicketCreationView(ui.View):
     async def report_button(self, interaction: discord.Interaction, button: ui.Button):
         await self.create_ticket(interaction, "Report")
 
-    @ui.button(label="Teambewerbung", style=discord.ButtonStyle.success, custom_id="ticket_application")
-    async def application_button(self, interaction: discord.Interaction, button: ui.Button):
-        await self.create_ticket(interaction, "Application")
-
-    @ui.button(label="Adminticket", style=discord.ButtonStyle.secondary, custom_id="ticket_admin")
-    async def admin_button(self, interaction: discord.Interaction, button: ui.Button):
-        await self.create_ticket(interaction, "Admin")
+    #@ui.button(label="Adminticket", style=discord.ButtonStyle.secondary, custom_id="ticket_admin")
+    #async def admin_button(self, interaction: discord.Interaction, button: ui.Button):
+    #    await self.create_ticket(interaction, "Admin")
 
 
 class TicketManagementView(ui.View):
