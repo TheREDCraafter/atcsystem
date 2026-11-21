@@ -114,11 +114,22 @@ class TicketManagementView(ui.View):
                 elif child.custom_id == "ticket_transcript":
                     child.disabled = not is_closed
 
+    def check_permissions(self, interaction: discord.Interaction) -> bool:
+        user_role_ids = {role.id for role in interaction.user.roles}
+        allowed_roles = (settings.get("admin_role_ids") or []) + (settings.get("moderator_role_ids") or [])
+
+        for role_id in allowed_roles:
+            if int(role_id) in user_role_ids:
+                return True
+        return False
+
     @ui.button(label="Close", style=discord.ButtonStyle.secondary, custom_id="ticket_close")
-    async def close_button(self, interaction: discord.Interaction, button: ui.Button):
-        if not interaction.user.guild_permissions.manage_channels:
-            await interaction.response.send_message("Du hast keine Berechtigung, dieses Ticket zu schließen.",
-                                                    ephemeral=True)
+    async def close_button(self: "TicketManagementView", interaction: discord.Interaction, button: ui.Button):
+        if not self.check_permissions(interaction):
+            await interaction.response.send_message(
+                "Du hast keine Berechtigung, dieses Ticket zu schließen.",
+                ephemeral=True
+            )
             return
 
         overwrites = interaction.channel.overwrites
@@ -151,10 +162,12 @@ class TicketManagementView(ui.View):
         await interaction.followup.send(msg)
 
     @ui.button(label="Reopen", style=discord.ButtonStyle.success, custom_id="ticket_reopen")
-    async def reopen_button(self, interaction: discord.Interaction, button: ui.Button):
-        if not interaction.user.guild_permissions.manage_channels:
-            await interaction.response.send_message("Du hast keine Berechtigung, dieses Ticket wiederzueröffnen.",
-                                                    ephemeral=True)
+    async def reopen_button(self: "TicketManagementView", interaction: discord.Interaction, button: ui.Button):
+        if not self.check_permissions(interaction):
+            await interaction.response.send_message(
+                "Du hast keine Berechtigung, dieses Ticket zu schließen.",
+                ephemeral=True
+            )
             return
 
         overwrites = interaction.channel.overwrites
@@ -191,10 +204,12 @@ class TicketManagementView(ui.View):
                                         ephemeral=True)
 
     @ui.button(label="Delete", style=discord.ButtonStyle.danger, custom_id="ticket_delete")
-    async def delete_button(self, interaction: discord.Interaction, button: ui.Button):
-        if not interaction.user.guild_permissions.manage_channels:
-            await interaction.response.send_message("Du hast keine Berechtigung, dieses Ticket zu löschen.",
-                                                    ephemeral=True)
+    async def delete_button(self: "TicketManagementView", interaction: discord.Interaction, button: ui.Button):
+        if not self.check_permissions(interaction):
+            await interaction.response.send_message(
+                "Du hast keine Berechtigung, dieses Ticket zu schließen.",
+                ephemeral=True
+            )
             return
 
         is_closed = False
