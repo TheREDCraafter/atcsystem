@@ -101,7 +101,10 @@ class TicketCreationView(ui.View):
 
     @ui.button(label="Frage an Support", style=discord.ButtonStyle.primary, custom_id="ticket_support")
     async def support_button(self, interaction: discord.Interaction, button: ui.Button):
-        await self.create_ticket(interaction, "Support")
+        if not interaction.user.id in settings.get("exluded_users", []):
+            await self.create_ticket(interaction, "Support")
+        else:
+            await interaction.response.send_message("Du kannst leider keine Tickets mehr estellen", ephemeral=True)
 
     @ui.button(label="Reports", style=discord.ButtonStyle.danger, custom_id="ticket_report")
     async def report_button(self, interaction: discord.Interaction, button: ui.Button):
