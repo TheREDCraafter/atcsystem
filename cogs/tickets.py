@@ -35,7 +35,7 @@ async def generate_transcript_to_file(channel: discord.TextChannel) -> discord.F
         transcript += f"[{time_str}] {msg.author}: {msg.clean_content}\n"
         for att in msg.attachments:
             transcript += f"[{time_str}] {msg.author}: [Attachment] {att.url}\n"
-    open(f"transcripts/transcript-{channel.name}.txt", "wb").write(transcript.encode('utf-8'))
+    open(f"{settings.get("transcriptstpath")}/transcript-{channel.name}.txt", "wb").write(transcript.encode('utf-8'))
 
 
 class TicketCreationView(ui.View):

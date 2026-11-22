@@ -4,5 +4,6 @@
     "auto_role_ids": [],
     "ticket_creation_channel_id": 1572959991848112358,
     "admin_role_ids": [1189126434405494794],
-    "ticket_category_id": 1566884741473509386
+    "ticket_category_id": 1566884741473509386,
+    "transcriptstpath": "transcripts"
 }
