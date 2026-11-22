@@ -11,7 +11,7 @@ from settings import settings
 logger = logging.getLogger(__name__)
 
 
-async def generate_transcript(channel: discord.TextChannel) -> discord.File:
+async def generate_transcript_to_dm(channel: discord.TextChannel) -> discord.File:
     """Helper function to generate a text transcript of a channel."""
     transcript = f"Transcript for {channel.name}\n"
     transcript += "=" * 40 + "\n\n"
@@ -24,6 +24,18 @@ async def generate_transcript(channel: discord.TextChannel) -> discord.File:
 
     buffer = io.BytesIO(transcript.encode('utf-8'))
     return discord.File(fp=buffer, filename=f"transcript-{channel.name}.txt")
+
+async def generate_transcript_to_file(channel: discord.TextChannel) -> discord.File:
+    """Helper function to generate a text transcript of a channel."""
+    transcript = f"Transcript for {channel.name}\n"
+    transcript += "=" * 40 + "\n\n"
+
+    async for msg in channel.history(limit=None, oldest_first=True):
+        time_str = msg.created_at.strftime("%Y-%m-%d %H:%M:%S")
+        transcript += f"[{time_str}] {msg.author}: {msg.clean_content}\n"
+        for att in msg.attachments:
+            transcript += f"[{time_str}] {msg.author}: [Attachment] {att.url}\n"
+    open(f"transcripts/transcript-{channel.name}.txt", "wb").write(transcript.encode('utf-8'))
 
 
 class TicketCreationView(ui.View):
@@ -203,7 +215,7 @@ class TicketManagementView(ui.View):
     async def transcript_button(self, interaction: discord.Interaction, button: ui.Button):
         # We process the transcript generation and send it to the user who clicked it.
         await interaction.response.defer(ephemeral=True)
-        transcript_file = await generate_transcript(interaction.channel)
+        transcript_file = await generate_transcript_to_dm(interaction.channel)
         await interaction.followup.send("Hier ist das Transkript für dieses Ticket:", file=transcript_file,
                                         ephemeral=True)
 
@@ -234,10 +246,7 @@ class TicketManagementView(ui.View):
             # Send the transcript to the ticket creator via DM before channel is deleted
             if target_user:
                 try:
-                    transcript_file = await generate_transcript(interaction.channel)
-                    await target_user.send(
-                        f"Dein Ticket **{interaction.channel.name}** auf {interaction.guild.name} wurde gelöscht. Hier ist das Transkript:",
-                        file=transcript_file)
+                    transcript_file = await generate_transcript_to_file(interaction.channel)
                 except discord.Forbidden:
                     logger.warning(f"Could not send transcript DM to {target_user} (DMs probably closed).")
 
