@@ -60,6 +60,10 @@ class TicketCreationView(ui.View):
         # Get next ticket number
         ticket_count = self.bot.storage.get("ticket_count", 0) + 1
         self.bot.storage.set("ticket_count", ticket_count)
+        zeros = 3
+        zeros -= len(str(ticket_count))
+        for i in range(zeros):
+            ticket_count = "0" + str(ticket_count)
 
         channel_name = f"ticket-{ticket_count}-{ticket_type.lower().replace(' ', '-')}"
 
